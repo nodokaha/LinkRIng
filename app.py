@@ -60,12 +60,14 @@ def Screen(x, y):
 
 def Touch(unused_addr, args, touch_flag):
     if touch_flag:
-        client.send_message("/avatar/parameters/Check", true)
+        client.send_message("/avatar/parameters/Check", True)
+        Screen(0.25, 1.0)
 
 def Check(unused_addr, args, touch_flag):
     if touch_flag:
-        client.send_message("/avatar/parameters/Check", false)
+        client.send_message("/avatar/parameters/Check", False)
         TweetPost(message, SettingImageList())
+        Screen(0.5, 1.0)
 
 def TouchOne(unused_addr, args, touch_flag):
     global message
