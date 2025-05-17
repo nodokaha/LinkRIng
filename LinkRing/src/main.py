@@ -59,37 +59,37 @@ def Check(unused_addr, args, touch_flag):
 def TouchOne(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "One Test Message"
+        message = message_one
 
 def TouchTwo(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Two Test Message"
+        message = message_two
 
 def TouchThree(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Three Test Message"
+        message = message_three
 
 def TouchFour(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Four Test Message"
+        message = message_four
 
 def TouchFive(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Five Test Message"
+        message = message_five
 
 def TouchSix(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Six Test Message"
+        message = message_six
 
 def TouchSeven(unused_addr, args, touch_flag):
     global message
     if touch_flag:
-        message = "Seven Test Message"
+        message = message_seven
 
 def main(page: ft.Page):
     if Path(".token_config").exists():
@@ -108,11 +108,11 @@ def main(page: ft.Page):
             )
             f = open(".token_config", "w")
             json.dump([user_at, user_ats], f)
-            auth = tweepy.OAuth1UserHandler(at, ats, user_at, user_ats)
-            api = tweepy.API(auth)
             page.controls.pop(0)
             page.update()
         page.add(ft.Row(controls=[pw, ft.ElevatedButton(text="Enter", on_click=auth)]))
+    auth = tweepy.OAuth1UserHandler(at, ats, user_at, user_ats)
+    api = tweepy.API(auth)
     counter = ft.Text("0", size=50, data=0)
 
     def increment_click(e):
@@ -120,6 +120,24 @@ def main(page: ft.Page):
         counter.value = str(counter.data)
         counter.update()
 
+    def set_message(e):
+        message_one = t1.value
+        message_two = t2.value
+        message_three = t3.value
+        message_four = t4.value
+        message_five = t5.value
+        message_six = t6.value
+        message_seven = t7.value
+        page.update()
+
+    t1 = ft.TextField(label="message_one")
+    t2 = ft.TextField(label="message_two")
+    t3 = ft.TextField(label="message_three")
+    t4 = ft.TextField(label="message_four")
+    t5 = ft.TextField(label="message_five")
+    t6 = ft.TextField(label="message_six")
+    t7 = ft.TextField(label="message_seven")
+    
     page.floating_action_button = ft.FloatingActionButton(
         icon=ft.Icons.ADD, on_click=increment_click
     )
@@ -130,8 +148,30 @@ def main(page: ft.Page):
                 alignment=ft.alignment.center,
             ),
             expand=True,
+        ),
+        ft.Row(
+            controls=[t1, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t2, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t3, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t4, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t5, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t6, ft.ElevatedButton(text="set", on_click=set_message)]
+        ),
+        ft.Row(
+            controls=[t7, ft.ElevatedButton(text="set", on_click=set_message)]
         )
     )
+
     dispatcher = Dispatcher()
     dispatcher.map("/avatar/parameters/Touch", Touch, "TouchFlag")
     dispatcher.map("/avatar/parameters/TouchOne", TouchOne, "TouchFlag")
