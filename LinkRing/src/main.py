@@ -16,14 +16,16 @@ at = "udUcuD2dicPTciDrjr5HgGHIO"
 ats = "X5V8AukObOXdcGl1GHnjowNHVLlbknBwJNdA0XDVPnjECcuu6d"
 client = udp_client.SimpleUDPClient('127.0.0.1', 9000)
 message = "test Message"
+image_count = 1
 
 def SettingImageList():
+    global image_count
     CSIDL_MYPICTURES = 0x27
     buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
     ctypes.windll.shell32.SHGetFolderPathW(0, CSIDL_MYPICTURES, 0, 0, buf)
     picture_folder = list(Path(buf.value + '/VRChat/' + datetime.now().strftime("%Y-%m")).glob(r'*.png'))
     picture_folder.sort(key=os.path.getctime, reverse=True)
-    media_path_list = [picture_folder[0]]
+    media_path_list = picture_folder[0:int(image_count)]
     media_list = []
     Screen(0.25, 1)
     for x in media_path_list:
@@ -49,6 +51,7 @@ def Touch(unused_addr, args, touch_flag):
         Screen(0.25, 1.0)
 
 def Check(unused_addr, args, touch_flag):
+    global message
     if touch_flag:
         print("tweet")
         client.send_message("/avatar/parameters/Check", 1)
@@ -92,9 +95,15 @@ def TouchSeven(unused_addr, args, touch_flag):
         message = message_seven
 
 def main(page: ft.Page):
+    global image_count
+    global api
+    global user_at
+    global user_ats
     if Path(".token_config").exists():
         f = open(".token_config", "r")
-        user_at, user_ats = json.load(f)
+        user_at, user_ats, image_count = json.load(f)
+        auth = tweepy.OAuth1UserHandler(at, ats, user_at, user_ats)
+        api = tweepy.API(auth)
     else:
         oauth1_user_handler = tweepy.OAuth1UserHandler(
             at, ats,
@@ -102,25 +111,39 @@ def main(page: ft.Page):
         )
         webbrowser.open(oauth1_user_handler.get_authorization_url(signin_with_twitter=True))
         pw = ft.TextField(label="Input Pin CODE", password=True, can_reveal_password=True)
-        def auth(e):
+        def auth(e):        
             user_at, user_ats = oauth1_user_handler.get_access_token(
                 pw.value
             )
             f = open(".token_config", "w")
-            json.dump([user_at, user_ats], f)
+            json.dump([user_at, user_ats, image_count], f)
+            auth = tweepy.OAuth1UserHandler(at, ats, user_at, user_ats)
+            api = tweepy.API(auth)
             page.controls.pop(0)
             page.update()
         page.add(ft.Row(controls=[pw, ft.ElevatedButton(text="Enter", on_click=auth)]))
-    auth = tweepy.OAuth1UserHandler(at, ats, user_at, user_ats)
-    api = tweepy.API(auth)
-    counter = ft.Text("0", size=50, data=0)
 
-    def increment_click(e):
-        counter.data += 1
-        counter.value = str(counter.data)
-        counter.update()
+    def set_image_count(e):
+        global image_count
+        image_count = e.control.value
+        page.update()
+
+    counter = ft.RadioGroup(content=ft.Column(
+    [
+        ft.Radio(value=1, label="1枚"),
+        ft.Radio(value=2, label="2枚"),
+        ft.Radio(value=3, label="3枚"),
+        ft.Radio(value=4, label="4枚"),
+    ]), on_change=set_image_count, value=image_count)
 
     def set_message(e):
+        global message_one
+        global message_two
+        global message_three
+        global message_four
+        global message_five
+        global message_six
+        global message_seven
         message_one = t1.value
         message_two = t2.value
         message_three = t3.value
@@ -138,9 +161,6 @@ def main(page: ft.Page):
     t6 = ft.TextField(label="message_six")
     t7 = ft.TextField(label="message_seven")
     
-    page.floating_action_button = ft.FloatingActionButton(
-        icon=ft.Icons.ADD, on_click=increment_click
-    )
     page.add(
         ft.SafeArea(
             ft.Container(
