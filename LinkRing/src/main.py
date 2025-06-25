@@ -59,7 +59,6 @@ def Screen(x, y):
 def Touch(unused_addr, args, touch_flag):
     if touch_flag:
         client.send_message("/avatar/parameters/Check", 1)
-        client.send_message("/avatar/parameters/Check", 0)
         print("check")
         Screen(0.25, 1.0)
 
@@ -68,7 +67,6 @@ def Check(unused_addr, args, touch_flag):
     global message
     if touch_flag:
         print("tweet")
-        client.send_message("/avatar/parameters/Check", 1)
         client.send_message("/avatar/parameters/Check", 0)
         if ohatweet:
             match datetime.weekday():
