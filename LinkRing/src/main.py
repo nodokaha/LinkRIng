@@ -22,6 +22,7 @@ ohatweet = False
 
 def SettingImageList():
     global image_count
+    global api
     CSIDL_MYPICTURES = 0x27
     buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
     ctypes.windll.shell32.SHGetFolderPathW(0, CSIDL_MYPICTURES, 0, 0, buf)
@@ -40,6 +41,10 @@ def SettingImageList():
 
 
 def TweetPost(message, media_list):
+    global at
+    global ats
+    global user_at
+    global user_ats
     client = tweepy.Client(
         consumer_key=at,
         consumer_secret=ats,
@@ -58,6 +63,7 @@ def Screen(x, y):
 
 def Touch(unused_addr, args, touch_flag):
     if touch_flag:
+        time.sleep(0.5)
         client.send_message("/avatar/parameters/Check", 1)
         print("check")
         Screen(0.25, 1.0)
@@ -65,6 +71,7 @@ def Touch(unused_addr, args, touch_flag):
 
 def Check(unused_addr, args, touch_flag):
     global message
+    global client
     if touch_flag:
         print("tweet")
         client.send_message("/avatar/parameters/Check", 0)
@@ -159,6 +166,8 @@ def main(page: ft.Page):
         )
 
         def auth(e):
+            global api
+            global auth
             user_at, user_ats = oauth1_user_handler.get_access_token(pw.value)
             f = open(".token_config", "w")
             json.dump([user_at, user_ats, image_count], f)
